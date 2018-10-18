@@ -3,6 +3,7 @@ import random
 import math
 import warnings
 from sys import maxsize
+ATTACKED_lt = 0
 
 """
 Most of the algo code you write will be in this file unless you create new
@@ -39,7 +40,8 @@ class AlgoStrategy(gamelib.AlgoCore):
         PING = config["unitInformation"][3]["shorthand"]
         EMP = config["unitInformation"][4]["shorthand"]
         SCRAMBLER = config["unitInformation"][5]["shorthand"]
-
+        global ATTACKED_lt
+        ATTACKED_lt = 0
 
     def on_turn(self, turn_state):
         """
@@ -146,11 +148,13 @@ class AlgoStrategy(gamelib.AlgoCore):
 
 
     def deploy_attackers(self, game_state):
-        if (not(game_state.can_spawn(FILTER, [ 14, 1]))):
+        global ATTACKED_lt
+        if (ATTACKED_lt == 1):
+            ATTACKED_lt = 0
             while (game_state.get_resource(game_state.BITS) >= 1):
                 if (game_state.can_spawn(PING, [ 14, 0])):
                     game_state.attempt_spawn(PING, [ 14, 0])
-            game_state.attempt_remove([ 14, 1]) 
+             
         
         if (game_state.turn_number <= 10 or game_state.get_resource(game_state.BITS) < 6 + (int (game_state.turn_number / 10) * 3)):
             return
@@ -158,6 +162,7 @@ class AlgoStrategy(gamelib.AlgoCore):
             game_state.attempt_spawn(EMP, [2, 11])
         game_state.can_spawn(FILTER, [ 14, 1])
         game_state.attempt_spawn(FILTER, [ 14, 1])
+        ATTACKED_lt = 1
         
 
 if __name__ == "__main__":
