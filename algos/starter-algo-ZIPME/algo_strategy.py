@@ -90,7 +90,7 @@ class AlgoStrategy(gamelib.AlgoCore):
 
 
     def buildBase(self, game_state):
-        if (game_state.turn_number <= 10):
+        if (game_state.turn_number <= 5):
 
             #Destructor
             firewall_locations = [[ 3, 12],[ 24, 12],[ 5, 11],[ 9, 11],[ 10, 11],[ 13, 11],[ 14, 11],[ 17, 11],[ 18, 11],[ 22, 11]]
@@ -103,9 +103,9 @@ class AlgoStrategy(gamelib.AlgoCore):
             for location in firewall_locations:
                 if game_state.can_spawn(FILTER, location):
                     game_state.attempt_spawn(FILTER, location)
-            return
+            
 
-        firewall_locations = [[ 3, 12],[ 24, 12],[ 5, 11],[ 9, 11],[ 10, 11],[ 13, 11],[ 14, 11],[ 17, 11],[ 18, 11],[ 22, 11]]
+        firewall_locations = [[ 2, 13],[ 4, 12],[ 24, 12],[ 25, 12],[ 5, 11],[ 9, 11],[ 10, 11],[ 13, 11],[ 14, 11],[ 17, 11],[ 18, 11],[ 22, 11],[ 6, 10],[ 9, 10],[ 18, 10],[ 21, 10],[ 7, 9],[ 20, 9]]
         for location in firewall_locations:
             if game_state.can_spawn(DESTRUCTOR, location):
                 game_state.attempt_spawn(DESTRUCTOR, location) 
@@ -116,15 +116,17 @@ class AlgoStrategy(gamelib.AlgoCore):
 
     def build_defences(self, game_state):
 
-        firewall_locations = [[ 3, 12],[ 24, 12],[ 5, 11],[ 9, 11],[ 10, 11],[ 13, 11],[ 14, 11],[ 17, 11],[ 18, 11],[ 22, 11]]
-        for location in firewall_locations:
-            if game_state.can_spawn(DESTRUCTOR, location):
-                game_state.attempt_spawn(DESTRUCTOR, location) 
  
-        firewall_locations = [[ 3, 13],[ 24, 13],[ 5, 12],[ 9, 12],[ 10, 12],[ 13, 12],[ 14, 12],[ 17, 12],[ 18, 12],[ 22, 12]]
+ 
+        firewall_locations = [[ 4, 13],[ 24, 13],[ 25, 13],[ 5, 12],[ 9, 12],[ 10, 12],[ 17, 12],[ 18, 12],[ 22, 12],[ 23, 12],[ 6, 11],[ 11, 11],[ 12, 11],[ 15, 11],[ 16, 11],[ 21, 11],[ 20, 10],[ 7, 9],[ 8, 8]]
         for location in firewall_locations:
             if game_state.can_spawn(FILTER, location):
                 game_state.attempt_spawn(FILTER, location)
+
+        firewall_locations = [[ 3, 13],[ 9, 10],[ 18, 10]]
+        for location in firewall_locations:
+            if game_state.can_spawn(DESTRUCTOR, location):
+                game_state.attempt_spawn(DESTRUCTOR, location)
 
         if ((game_state.turn_number > 8)):
             firewall_locations = [[ 3, 12],[ 4, 11],[ 5, 10]]
@@ -143,8 +145,8 @@ class AlgoStrategy(gamelib.AlgoCore):
     def deploy_attackers(self, game_state):
         if (not(game_state.can_spawn(FILTER, [ 14, 1]))):
             while (game_state.get_resource(game_state.BITS) >= 1):
-                if (game_state.can_spawn(PING, [2, 11])):
-                    game_state.attempt_spawn(PING, [2, 11])
+                if (game_state.can_spawn(PING, [ 14, 0])):
+                    game_state.attempt_spawn(PING, [ 14, 0])
             game_state.attempt_remove([ 14, 1]) 
         
         if (game_state.turn_number <= 10 or game_state.get_resource(game_state.BITS) < 6 + (int (game_state.turn_number / 10) * 3)):
