@@ -99,7 +99,7 @@ class AlgoStrategy(gamelib.AlgoCore):
                     game_state.attempt_spawn(DESTRUCTOR, location)  
 
             #filter
-            firewall_locations = [[ 3, 13],[ 24, 13],[ 5, 12],[ 9, 12],[ 10, 12],[ 13, 12],[ 14, 12],[ 17, 12],[ 18, 12],[ 22, 12]]
+            firewall_locations = [[ 3, 13],[ 24, 13],[ 5, 12],[ 9, 12],[ 10, 12],[ 13, 12],[ 14, 12],[ 17, 12],[ 18, 12],[ 22, 12],[ 26, 13],[ 27, 13]]
             for location in firewall_locations:
                 if game_state.can_spawn(FILTER, location):
                     game_state.attempt_spawn(FILTER, location)
@@ -117,17 +117,20 @@ class AlgoStrategy(gamelib.AlgoCore):
     def build_defences(self, game_state):
 
  
- 
-        firewall_locations = [[ 4, 13],[ 24, 13],[ 25, 13],[ 5, 12],[ 9, 12],[ 10, 12],[ 17, 12],[ 18, 12],[ 22, 12],[ 23, 12],[ 6, 11],[ 11, 11],[ 12, 11],[ 15, 11],[ 16, 11],[ 21, 11],[ 20, 10],[ 7, 9],[ 8, 8]]
+        #FILTER
+        firewall_locations = [[ 4, 13],[ 24, 13],[ 25, 13],[ 5, 12],[ 9, 12],[ 10, 12],[ 17, 12],[ 18, 12],[ 22, 12],[ 23, 12],[ 6, 11],[ 11, 11],[ 12, 11],[ 15, 11],[ 16, 11],[ 21, 11],[ 20, 10],[ 7, 9],[ 8, 8],[ 26, 13],[ 27, 13]]
         for location in firewall_locations:
             if game_state.can_spawn(FILTER, location):
                 game_state.attempt_spawn(FILTER, location)
-
+        #DESTRUCTOR
         firewall_locations = [[ 3, 13],[ 9, 10],[ 18, 10]]
         for location in firewall_locations:
             if game_state.can_spawn(DESTRUCTOR, location):
                 game_state.attempt_spawn(DESTRUCTOR, location)
-
+        ##ENCRYPTOR making room
+        if ((game_state.turn_number == 10)):
+        	game_state.attempt_remove([ 3, 12]) 
+        ##ENCRYPTOR
         if ((game_state.turn_number > 8)):
             firewall_locations = [[ 3, 12],[ 4, 11],[ 5, 10]]
             for location in firewall_locations:
@@ -156,15 +159,6 @@ class AlgoStrategy(gamelib.AlgoCore):
         game_state.can_spawn(FILTER, [ 14, 1])
         game_state.attempt_spawn(FILTER, [ 14, 1])
         
-
-    """   
-    def filter_blocked_locations(self, locations, game_state):
-        filtered = []
-        for location in locations:
-            if not game_state.contains_stationary_unit(location):
-                filtered.append(location)
-        return filtered
-    """
 
 if __name__ == "__main__":
     algo = AlgoStrategy()
