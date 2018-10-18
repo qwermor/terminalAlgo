@@ -67,15 +67,11 @@ class AlgoStrategy(gamelib.AlgoCore):
 
         self.buildBase(game_state)
 
-        """
-        Then build additional defenses.
-        """
+
         self.build_defences(game_state)
 
-        """
-        Finally deploy our information units to attack.
-        """
         self.deploy_SCRAMBLER(game_state)
+
         self.deploy_attackers(game_state)
     
     def round1(self, game_state):
@@ -86,9 +82,7 @@ class AlgoStrategy(gamelib.AlgoCore):
                 if game_state.can_spawn(FILTER, location):
                     game_state.attempt_spawn(FILTER, location)
             
-            """
-            Destructors
-            """
+            #Destructors
             firewall_locations = [[ 24, 12],[ 5, 11],[ 9, 11],[ 13, 11],[ 18, 11],[ 22, 11]]
             for location in firewall_locations:
                 if game_state.can_spawn(DESTRUCTOR, location):
@@ -98,9 +92,7 @@ class AlgoStrategy(gamelib.AlgoCore):
     def buildBase(self, game_state):
         if (game_state.turn_number <= 10):
 
-            """
-            Destructors
-            """
+            #Destructor
             firewall_locations = [[ 3, 12],[ 24, 12],[ 5, 11],[ 9, 11],[ 10, 11],[ 13, 11],[ 14, 11],[ 17, 11],[ 18, 11],[ 22, 11]]
             for location in firewall_locations:
                 if game_state.can_spawn(DESTRUCTOR, location):
@@ -113,58 +105,64 @@ class AlgoStrategy(gamelib.AlgoCore):
                     game_state.attempt_spawn(FILTER, location)
             return
 
+        firewall_locations = [[ 3, 12],[ 24, 12],[ 5, 11],[ 9, 11],[ 10, 11],[ 13, 11],[ 14, 11],[ 17, 11],[ 18, 11],[ 22, 11]]
+        for location in firewall_locations:
+            if game_state.can_spawn(DESTRUCTOR, location):
+                game_state.attempt_spawn(DESTRUCTOR, location) 
+
+
+
 
 
     def build_defences(self, game_state):
 
+        firewall_locations = [[ 3, 12],[ 24, 12],[ 5, 11],[ 9, 11],[ 10, 11],[ 13, 11],[ 14, 11],[ 17, 11],[ 18, 11],[ 22, 11]]
+        for location in firewall_locations:
+            if game_state.can_spawn(DESTRUCTOR, location):
+                game_state.attempt_spawn(DESTRUCTOR, location) 
+ 
+        firewall_locations = [[ 3, 13],[ 24, 13],[ 5, 12],[ 9, 12],[ 10, 12],[ 13, 12],[ 14, 12],[ 17, 12],[ 18, 12],[ 22, 12]]
+        for location in firewall_locations:
+            if game_state.can_spawn(FILTER, location):
+                game_state.attempt_spawn(FILTER, location)
 
-        """
-        Lastly lets build encryptors in random locations. Normally building 
-        randomly is a bad idea but we'll leave it to you to figure out better 
-        strategies. 
+        if ((game_state.turn_number > 8)):
+            firewall_locations = [[ 3, 12],[ 4, 11],[ 5, 10]]
+            for location in firewall_locations:
+                if game_state.can_spawn(ENCRYPTOR, location):
+                    game_state.attempt_spawn(ENCRYPTOR, location)
 
-        First we get all locations on the bottom half of the map
-        that are in the arena bounds.
-        
-        all_locations = []
-        for i in range(game_state.ARENA_SIZE):
-            for j in range(math.floor(game_state.ARENA_SIZE / 2)):
-                if (game_state.game_map.in_arena_bounds([i, j])):
-                    all_locations.append([i, j])
-        
-        
-        Then we remove locations already occupied.
-        
-        possible_locations = self.filter_blocked_locations(all_locations, game_state)
-
-        
-        While we have cores to spend, build a random Encryptor.
-        
-        while game_state.get_resource(game_state.CORES) >= game_state.type_cost(ENCRYPTOR) and len(possible_locations) > 0:
-            # Choose a random location.
-            location_index = random.randint(0, len(possible_locations) - 1)
-            build_location = possible_locations[location_index]
-            
-            Build it and remove the location since you can't place two 
-            firewalls in the same location.
-            
-            game_state.attempt_spawn(ENCRYPTOR, build_location)
-            possible_locations.remove(build_location)
-        """
     def deploy_SCRAMBLER(self, game_state):
         if (game_state.turn_number <= 10):
             deploy_location = [[ 2, 11],[ 25, 11],[ 10, 3],[ 17, 3]]
-            if game_state.can_spawn(SCRAMBLER, deploy_location):
-                game_state.attempt_spawn(SCRAMBLER, deploy_location)
+            for location in deploy_location:
+                if game_state.can_spawn(SCRAMBLER, location):
+                    game_state.attempt_spawn(SCRAMBLER, location)
+
 
     def deploy_attackers(self, game_state):
+        if (not(game_state.can_spawn(FILTER, [ 14, 1]))):
+            while (game_state.get_resource(game_state.BITS) >= 1):
+                if (game_state.can_spawn(PING, [2, 11])):
+                    game_state.attempt_spawn(PING, [2, 11])
+            game_state.attempt_remove([ 14, 1]) 
         
+        if (game_state.turn_number <= 10 or game_state.get_resource(game_state.BITS) < 6 + (int (game_state.turn_number / 10) * 3)):
+            return
+        while game_state.can_spawn(EMP, [2, 11]):
+            game_state.attempt_spawn(EMP, [2, 11])
+        game_state.can_spawn(FILTER, [ 14, 1])
+        game_state.attempt_spawn(FILTER, [ 14, 1])
+        
+
+    """   
     def filter_blocked_locations(self, locations, game_state):
         filtered = []
         for location in locations:
             if not game_state.contains_stationary_unit(location):
                 filtered.append(location)
         return filtered
+    """
 
 if __name__ == "__main__":
     algo = AlgoStrategy()
