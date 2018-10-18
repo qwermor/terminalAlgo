@@ -119,11 +119,19 @@ class AlgoStrategy(gamelib.AlgoCore):
             for location in firewall_locations:
                 if game_state.can_spawn(DESTRUCTOR, location):
                     game_state.attempt_spawn(DESTRUCTOR, location)
-            if (game_state.get_resource(game_state.BITS) > 20):
-                firewall_locations = [[ 11, 8],[ 12, 8],[ 15, 8],[ 16, 8],[ 19, 8],[ 9, 7]]
-                for location in firewall_locations:
-                    if game_state.can_spawn(DESTRUCTOR, location):
-                        game_state.attempt_spawn(DESTRUCTOR, location)
+
+        if (game_state.get_resource(game_state.BITS) > 20):
+            firewall_locations = [[ 11, 8],[ 12, 8],[ 15, 8],[ 16, 8],[ 19, 8],[ 9, 7]]
+            for location in firewall_locations:
+                if game_state.can_spawn(DESTRUCTOR, location):
+                    game_state.attempt_spawn(DESTRUCTOR, location)
+        ##Tunnelstrat          
+        if ((game_state.turn_number > 30)):
+            firewall_locations = [[ 9, 7],[ 10, 6],[ 11, 5],[ 12, 4],[ 13, 3],[ 14, 2],[ 15, 1]]
+            for location in firewall_locations:
+                if game_state.can_spawn(FILTER, location):
+                    game_state.attempt_spawn(FILTER, location)
+
     def deploy_SCRAMBLER(self, game_state):
         if (game_state.turn_number <= 10):
             deploy_location = [[ 4, 9],[ 23, 9],[ 10, 3],[ 17, 3]]
@@ -136,7 +144,7 @@ class AlgoStrategy(gamelib.AlgoCore):
 
     def deploy_attackers(self, game_state):
 
-        free = not(game_state.contains_stationary_unit([ 1, 15]) and game_state.contains_stationary_unit([ 0, 14]) and game_state.contains_stationary_unit([ 1, 14]))
+        free = not(game_state.contains_stationary_unit([ 0, 14]) and game_state.contains_stationary_unit([ 1, 14]))
         if (free):
             while (game_state.get_resource(game_state.BITS) >= 1):
                 if (game_state.can_spawn(PING, [ 14, 0])):
