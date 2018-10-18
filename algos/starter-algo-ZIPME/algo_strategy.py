@@ -3,7 +3,7 @@ import random
 import math
 import warnings
 from sys import maxsize
-ATTACKED_lt = 0
+
 
 
 class AlgoStrategy(gamelib.AlgoCore):
@@ -22,8 +22,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         PING = config["unitInformation"][3]["shorthand"]
         EMP = config["unitInformation"][4]["shorthand"]
         SCRAMBLER = config["unitInformation"][5]["shorthand"]
-        global ATTACKED_lt
-        ATTACKED_lt = 0
+
 
     def on_turn(self, turn_state):
 
@@ -136,21 +135,20 @@ class AlgoStrategy(gamelib.AlgoCore):
 
 
     def deploy_attackers(self, game_state):
-        global ATTACKED_lt
-        if (ATTACKED_lt == 1):
-            ATTACKED_lt = 0
+
+        free = not(game_state.contains_stationary_unit([ 1, 15]) and game_state.contains_stationary_unit([ 0, 14]) and game_state.contains_stationary_unit([ 1, 14]))
+        if (free):
             while (game_state.get_resource(game_state.BITS) >= 1):
                 if (game_state.can_spawn(PING, [ 14, 0])):
                     game_state.attempt_spawn(PING, [ 14, 0])
              
         
-        if (game_state.turn_number <= 10 or game_state.get_resource(game_state.BITS) < 9 + (int (game_state.turn_number / 10) * 3)):
+        if (game_state.turn_number <= 10 or game_state.get_resource(game_state.BITS) < 12 + (int (game_state.turn_number / 10) * 3)):
             return
         while game_state.can_spawn(EMP, [2, 11]):
             game_state.attempt_spawn(EMP, [2, 11])
         game_state.can_spawn(FILTER, [ 14, 1])
         game_state.attempt_spawn(FILTER, [ 14, 1])
-        ATTACKED_lt = 1
         
 
 if __name__ == "__main__":
