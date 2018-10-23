@@ -43,11 +43,11 @@ class AlgoStrategy(gamelib.AlgoCore):
 
         self.buildBase(game_state)
 
+        self.deploy_attackers(game_state)
+
         self.build_defences(game_state)
 
         self.deploy_SCRAMBLER(game_state)
-
-        self.deploy_attackers(game_state)
 
 
     
