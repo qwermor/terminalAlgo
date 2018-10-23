@@ -3,8 +3,8 @@ import random
 import math
 import warnings
 from sys import maxsize
-
-
+attack_stage = 0
+lateGame_tunnel = 0
 
 class AlgoStrategy(gamelib.AlgoCore):
     def __init__(self):
@@ -43,11 +43,11 @@ class AlgoStrategy(gamelib.AlgoCore):
 
         self.buildBase(game_state)
 
+        self.deploy_attackers(game_state)
+
         self.build_defences(game_state)
 
         self.deploy_SCRAMBLER(game_state)
-
-        self.deploy_attackers(game_state)
 
 
     
@@ -70,7 +70,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         if (game_state.turn_number <= 5):
 
             #Destructor
-            firewall_locations = [[ 3, 12],[ 24, 12],[ 5, 11],[ 9, 11],[ 10, 11],[ 13, 11],[ 14, 11],[ 17, 11],[ 18, 11],[ 22, 11]]
+            firewall_locations = [[ 3, 12],[ 24, 12],[ 5, 11],[ 9, 11],[ 13, 11],[ 14, 11],[ 18, 11],[ 22, 11],[ 25, 12],[ 26, 12]]
             for location in firewall_locations:
                 if game_state.can_spawn(DESTRUCTOR, location):
                     game_state.attempt_spawn(DESTRUCTOR, location)  
@@ -82,7 +82,7 @@ class AlgoStrategy(gamelib.AlgoCore):
                     game_state.attempt_spawn(FILTER, location)
             
 
-        firewall_locations = [[ 2, 13],[ 4, 12],[ 26, 12],[ 24, 12],[ 25, 12],[ 5, 11],[ 9, 11],[ 10, 11],[ 13, 11],[ 14, 11],[ 17, 11],[ 18, 11],[ 22, 11],[ 6, 10],[ 9, 10],[ 18, 10],[ 21, 10],[ 7, 9],[ 20, 9]]
+        firewall_locations = [[ 2, 13],[ 4, 12],[ 26, 12],[ 24, 12],[ 25, 12],[ 5, 11],[ 9, 11],[ 13, 11],[ 14, 11],[ 18, 11],[ 22, 11],[ 6, 10],[ 9, 10],[ 18, 10],[ 21, 10],[ 7, 9],[ 20, 9]]
         for location in firewall_locations:
             if game_state.can_spawn(DESTRUCTOR, location):
                 game_state.attempt_spawn(DESTRUCTOR, location) 
@@ -99,11 +99,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         for location in firewall_locations:
             if game_state.can_spawn(FILTER, location):
                 game_state.attempt_spawn(FILTER, location)
-        #DESTRUCTOR
-        firewall_locations = [[ 3, 13],[ 9, 10],[ 18, 10]]
-        for location in firewall_locations:
-            if game_state.can_spawn(DESTRUCTOR, location):
-                game_state.attempt_spawn(DESTRUCTOR, location)
+
         ##ENCRYPTOR making room
         if ((game_state.turn_number == 10)):
         	game_state.attempt_remove([ 3, 12]) 
@@ -115,17 +111,29 @@ class AlgoStrategy(gamelib.AlgoCore):
                     game_state.attempt_spawn(ENCRYPTOR, location)
         ##LATEGAME
         if ((game_state.turn_number > 20)):
-            firewall_locations = [[ 26, 13],[ 27, 13],[ 25, 11]]
+            firewall_locations = [[ 3, 13],[ 9, 10],[ 18, 10],[ 26, 13],[ 27, 13],[ 25, 11],[10, 11],[17,11]]
             for location in firewall_locations:
                 if game_state.can_spawn(DESTRUCTOR, location):
                     game_state.attempt_spawn(DESTRUCTOR, location)
-            if (game_state.get_resource(game_state.BITS) > 20):
-                firewall_locations = [[ 11, 8],[ 12, 8],[ 15, 8],[ 16, 8],[ 19, 8],[ 9, 7]]
-                for location in firewall_locations:
-                    if game_state.can_spawn(DESTRUCTOR, location):
-                        game_state.attempt_spawn(DESTRUCTOR, location)
+
+        if (game_state.get_resource(game_state.BITS) > 20):
+            firewall_locations = [[ 11, 8],[ 12, 8],[ 15, 8],[ 16, 8],[ 19, 8],[ 9, 7]]
+            for location in firewall_locations:
+                if game_state.can_spawn(DESTRUCTOR, location):
+                    game_state.attempt_spawn(DESTRUCTOR, location)
+        global lateGame_tunnel
+        ##Tunnelstrat          
+        if ((game_state.turn_number > 30)):
+            firewall_locations = [[ 9, 7],[ 10, 6],[ 11, 5],[ 12, 4],[ 13, 3],[ 14, 2],[ 15, 1]]
+            for location in firewall_locations:
+                if game_state.can_spawn(FILTER, location):
+                    game_state.attempt_spawn(FILTER, location)
+                    lateGame_tunnel = 1
+                    game_state.attempt_remove([ 1, 13])
+                    game_state.attempt_remove([ 0, 13])
+
     def deploy_SCRAMBLER(self, game_state):
-        if (game_state.turn_number <= 10):
+        if (game_state.turn_number <= 9):
             deploy_location = [[ 4, 9],[ 23, 9],[ 10, 3],[ 17, 3]]
             for location in deploy_location:
                 if game_state.can_spawn(SCRAMBLER, location):
@@ -135,20 +143,35 @@ class AlgoStrategy(gamelib.AlgoCore):
 
 
     def deploy_attackers(self, game_state):
+        global attack_stage
+        global lateGame_tunnel
+        free = not(game_state.contains_stationary_unit([ 0, 14]) and (game_state.contains_stationary_unit([ 1, 14]) or game_state.contains_stationary_unit([ 1, 15])))
 
-        free = not(game_state.contains_stationary_unit([ 1, 15]) and game_state.contains_stationary_unit([ 0, 14]) and game_state.contains_stationary_unit([ 1, 14]))
-        if (free):
+        if (not free and (attack_stage != 1) and (lateGame_tunnel == 0)): #closing gap
+            attack_stage = 0
+            for location in [[0,13],[1,13]]:
+                if game_state.can_spawn(FILTER, location):
+                    game_state.attempt_spawn(FILTER, location)
+
+        if (attack_stage == 1): #attacking emp
+            while game_state.can_spawn(EMP, [2, 11]):
+                game_state.attempt_spawn(EMP, [2, 11])
+            attack_stage = 2
+
+        if (free or (lateGame_tunnel == 1)): #follow up
             while (game_state.get_resource(game_state.BITS) >= 1):
+                if (lateGame_tunnel == 1): ## sending troops ahad to self-destruct
+                    if (game_state.can_spawn(PING, [ 12, 1])):
+                        game_state.attempt_spawn(PING, [ 12, 1])                       
                 if (game_state.can_spawn(PING, [ 14, 0])):
                     game_state.attempt_spawn(PING, [ 14, 0])
-             
-        
-        if (game_state.turn_number <= 10 or game_state.get_resource(game_state.BITS) < 12 + (int (game_state.turn_number / 10) * 3)):
+
+        if (game_state.turn_number <= 10 or game_state.get_resource(game_state.BITS) < 9 + (int (game_state.turn_number / 10) * 3)):
             return
-        while game_state.can_spawn(EMP, [2, 11]):
-            game_state.attempt_spawn(EMP, [2, 11])
-        game_state.can_spawn(FILTER, [ 14, 1])
-        game_state.attempt_spawn(FILTER, [ 14, 1])
+        attack_stage = 1
+        game_state.attempt_remove([ 1, 13])
+        game_state.attempt_remove([ 0, 13])
+
         
 
 if __name__ == "__main__":
