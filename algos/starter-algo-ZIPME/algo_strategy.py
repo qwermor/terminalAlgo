@@ -77,20 +77,27 @@ class AlgoStrategy(gamelib.AlgoCore):
             if game_state.can_spawn(DESTRUCTOR, location):
                 game_state.attempt_spawn(DESTRUCTOR, location)
 
-
-
         if game_state.turn_number == 6: ## encrypor
             game_state.attempt_remove([4,11])
         if game_state.can_spawn(ENCRYPTOR, [4,11]):
-            game_state.attempt_spawn(ENCRYPTOR, [4,11])   
+            game_state.attempt_spawn(ENCRYPTOR, [4,11])
+        #more
+
+        firewall_locations =[[ 5, 12],[ 5, 11],[ 8, 11],[ 25, 11],[ 9, 10],[ 13, 10],[ 14, 10],[ 19, 10],[ 20, 10],[ 24, 10],[ 20, 9],[ 23, 9],[ 19, 8],[ 11, 7],[ 12, 7],[ 16, 7],[ 17, 7],[ 4, 12]]
+        for location in firewall_locations:
+            if game_state.can_spawn(DESTRUCTOR, location):
+                game_state.attempt_spawn(DESTRUCTOR, location)
+
         ## add filter at [4,11],[ 26, 13]  
         newFilter = [[4,11],[ 26, 13]]        
         for location in newFilter:
             if game_state.can_spawn(FILTER, location):
                 game_state.attempt_spawn(FILTER, location)
-        self.randomDES(game_state)
+        self.randomDES(game_state, DESTRUCTOR)
+        if turns_cd == 0:
+            self.randomDES(game_state, FILTER)
 
-    def randomDES(self, game_state):
+    def randomDES(self, game_state, fixType):
         #all spots
         bank = [[ 4, 12],[ 5, 12],[ 6, 12],[ 9, 12],[ 10, 12],[ 13, 12],[ 14, 12],[ 17, 12],[ 18, 12],[ 21, 12],[ 22, 12],[ 23, 12],[ 24, 12],[ 25, 12],[ 5, 11],[ 8, 11],[ 9, 11],[ 10, 11],[ 11, 11],[ 12, 11],[ 13, 11],[ 15, 11],[ 16, 11],[ 17, 11],[ 18, 11],[ 19, 11],[ 20, 11],[ 21, 11],[ 22, 11],[ 23, 11],[ 24, 11],[ 6, 10],[ 7, 10],[ 8, 10],[ 10, 10],[ 11, 10],[ 13, 10],[ 14, 10],[ 15, 10],[ 17, 10],[ 18, 10],[ 19, 10],[ 20, 10],[ 21, 10],[ 22, 10],[ 23, 10],[ 7, 9],[ 9, 9],[ 12, 9],[ 14, 9],[ 16, 9],[ 17, 9],[ 18, 9],[ 19, 9],[ 20, 9],[ 21, 9],[ 22, 9],[ 8, 8],[ 10, 8],[ 13, 8],[ 14, 8],[ 16, 8],[ 17, 8],[ 18, 8],[ 19, 8],[ 20, 8],[ 21, 8],[ 12, 7],[ 14, 7],[ 17, 7],[ 18, 7],[ 19, 7],[ 20, 7],[ 10, 6],[ 14, 6],[ 15, 6],[ 16, 6],[ 17, 6],[ 19, 6],[ 13, 5],[ 15, 5],[ 17, 5],[ 18, 5],[ 16, 4],[ 17, 4]]        
         filtered = [] # filter for free
@@ -98,13 +105,14 @@ class AlgoStrategy(gamelib.AlgoCore):
             if not game_state.contains_stationary_unit(location):
                 filtered.append(location)
         # fill free spots
-        while game_state.get_resource(game_state.CORES) >= 3 and len(filtered) > 0:
+        while game_state.get_resource(game_state.CORES) >= game_state.type_cost(fixType) and len(filtered) > 0:
 
             location_index = random.randint(0, len(filtered) - 1)
             build_location = filtered[location_index]
-            if game_state.can_spawn(DESTRUCTOR, build_location):
-                game_state.attempt_spawn(DESTRUCTOR, build_location)
+            if game_state.can_spawn(fixType, build_location):
+                game_state.attempt_spawn(fixType, build_location)
             filtered.remove(build_location)       
+
 
 
     def deploy_attackers(self, game_state):
