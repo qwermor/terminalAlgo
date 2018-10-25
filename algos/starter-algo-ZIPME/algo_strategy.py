@@ -64,26 +64,37 @@ class AlgoStrategy(gamelib.AlgoCore):
 
     def build_defences(self, game_state):
         #filtertunnel
+        global turns_cd
         firewall_locations = [[ 5, 10],[ 6, 9],[ 7, 8],[ 8, 7],[ 9, 6],[ 10, 5],[ 11, 4],[ 12, 3],[ 13, 2],[ 14, 1]]
         for location in firewall_locations:
             if game_state.can_spawn(FILTER, location):
                 game_state.attempt_spawn(FILTER, location)
         if (game_state.get_resource(game_state.CORES) >= 4):
             if game_state.can_spawn(ENCRYPTOR, [3, 12]):
-                game_state.attempt_spawn(ENCRYPTOR, [3, 12])           
+                game_state.attempt_spawn(ENCRYPTOR, [3, 12]) 
+
+        if turns_cd >=1 :
+            for location in [[ 0, 13],[ 1, 13]]:
+                if game_state.can_spawn(FILTER, location):
+                    game_state.attempt_spawn(FILTER, location) 
+        if (turns_cd == 1):
+            for location in [[ 0, 13],[ 1, 13]]:
+                game_state.attempt_remove(location)
+
+                             
         #neccesary
-        firewall_locations = [[ 2, 13],[ 3, 13],[ 27, 13],[ 26, 12],[ 9, 11],[ 18, 11],[ 14, 9]]
+        firewall_locations = [[ 2, 13],[ 3, 13],[ 27, 13],[ 26, 12],[ 9, 11],[ 18, 11]]
         for location in firewall_locations:
             if game_state.can_spawn(DESTRUCTOR, location):
                 game_state.attempt_spawn(DESTRUCTOR, location)
 
-        if game_state.turn_number == 6: ## encrypor
+        if (game_state.get_resource(game_state.CORES) >= 4 and game_state.contains_unit_of_type(FILTER, [4,11])): ## encrypor
             game_state.attempt_remove([4,11])
         if game_state.can_spawn(ENCRYPTOR, [4,11]):
             game_state.attempt_spawn(ENCRYPTOR, [4,11])
         #more
 
-        firewall_locations =[[ 5, 12],[ 5, 11],[ 8, 11],[ 25, 11],[ 9, 10],[ 13, 10],[ 14, 10],[ 19, 10],[ 20, 10],[ 24, 10],[ 20, 9],[ 23, 9],[ 19, 8],[ 11, 7],[ 12, 7],[ 16, 7],[ 17, 7],[ 4, 12]]
+        firewall_locations =[[ 5, 12],[ 5, 11],[ 8, 11],[ 25, 11],[ 13, 10],[ 14, 10],[ 19, 10],[ 20, 10],[ 24, 10],[ 20, 9],[ 23, 9],[ 19, 8],[ 11, 7],[ 12, 7],[ 16, 7],[ 17, 7],[ 4, 12],[ 9, 10]]
         for location in firewall_locations:
             if game_state.can_spawn(DESTRUCTOR, location):
                 game_state.attempt_spawn(DESTRUCTOR, location)
@@ -99,7 +110,11 @@ class AlgoStrategy(gamelib.AlgoCore):
 
     def randomDES(self, game_state, fixType):
         #all spots
-        bank = [[ 4, 12],[ 5, 12],[ 6, 12],[ 9, 12],[ 10, 12],[ 13, 12],[ 14, 12],[ 17, 12],[ 18, 12],[ 21, 12],[ 22, 12],[ 23, 12],[ 24, 12],[ 25, 12],[ 5, 11],[ 8, 11],[ 9, 11],[ 10, 11],[ 11, 11],[ 12, 11],[ 13, 11],[ 15, 11],[ 16, 11],[ 17, 11],[ 18, 11],[ 19, 11],[ 20, 11],[ 21, 11],[ 22, 11],[ 23, 11],[ 24, 11],[ 6, 10],[ 7, 10],[ 8, 10],[ 10, 10],[ 11, 10],[ 13, 10],[ 14, 10],[ 15, 10],[ 17, 10],[ 18, 10],[ 19, 10],[ 20, 10],[ 21, 10],[ 22, 10],[ 23, 10],[ 7, 9],[ 9, 9],[ 12, 9],[ 14, 9],[ 16, 9],[ 17, 9],[ 18, 9],[ 19, 9],[ 20, 9],[ 21, 9],[ 22, 9],[ 8, 8],[ 10, 8],[ 13, 8],[ 14, 8],[ 16, 8],[ 17, 8],[ 18, 8],[ 19, 8],[ 20, 8],[ 21, 8],[ 12, 7],[ 14, 7],[ 17, 7],[ 18, 7],[ 19, 7],[ 20, 7],[ 10, 6],[ 14, 6],[ 15, 6],[ 16, 6],[ 17, 6],[ 19, 6],[ 13, 5],[ 15, 5],[ 17, 5],[ 18, 5],[ 16, 4],[ 17, 4]]        
+        if fixType == DESTRUCTOR:
+            bank = [[ 4, 12],[ 5, 12],[ 6, 12],[ 9, 12],[ 10, 12],[ 13, 12],[ 14, 12],[ 17, 12],[ 18, 12],[ 21, 12],[ 22, 12],[ 23, 12],[ 24, 12],[ 25, 12],[ 5, 11],[ 8, 11],[ 9, 11],[ 10, 11],[ 11, 11],[ 12, 11],[ 13, 11],[ 15, 11],[ 16, 11],[ 17, 11],[ 18, 11],[ 19, 11],[ 20, 11],[ 21, 11],[ 22, 11],[ 23, 11],[ 24, 11],[ 6, 10],[ 7, 10],[ 8, 10],[ 10, 10],[ 11, 10],[ 13, 10],[ 14, 10],[ 15, 10],[ 17, 10],[ 18, 10],[ 19, 10],[ 20, 10],[ 21, 10],[ 22, 10],[ 23, 10],[ 7, 9],[ 9, 9],[ 12, 9],[ 14, 9],[ 16, 9],[ 17, 9],[ 18, 9],[ 19, 9],[ 20, 9],[ 21, 9],[ 22, 9],[ 8, 8],[ 10, 8],[ 13, 8],[ 14, 8],[ 16, 8],[ 17, 8],[ 18, 8],[ 19, 8],[ 20, 8],[ 21, 8],[ 12, 7],[ 14, 7],[ 17, 7],[ 18, 7],[ 19, 7],[ 20, 7],[ 10, 6],[ 14, 6],[ 15, 6],[ 16, 6],[ 17, 6],[ 19, 6],[ 13, 5],[ 15, 5],[ 17, 5],[ 18, 5],[ 16, 4],[ 17, 4]]        
+        else:
+            bank = [[ 5, 12],[ 6, 12],[ 7, 12],[ 8, 12],[ 9, 12],[ 10, 12],[ 11, 12],[ 12, 12],[ 13, 12],[ 14, 12],[ 15, 12],[ 16, 12],[ 17, 12],[ 18, 12],[ 19, 12],[ 20, 12],[ 21, 12],[ 22, 12],[ 23, 12],[ 24, 12],[ 25, 12],[ 6, 11],[ 7, 11],[ 8, 11],[ 9, 11],[ 10, 11],[ 11, 11],[ 12, 11],[ 13, 11],[ 14, 11],[ 15, 11],[ 16, 11],[ 17, 11],[ 18, 11],[ 19, 11],[ 20, 11],[ 21, 11],[ 22, 11],[ 23, 11],[ 24, 11],[ 7, 10],[ 8, 10],[ 9, 10],[ 10, 10],[ 11, 10],[ 12, 10],[ 13, 10],[ 14, 10],[ 15, 10],[ 16, 10],[ 17, 10],[ 18, 10],[ 19, 10],[ 20, 10],[ 21, 10],[ 22, 10],[ 23, 10],[ 8, 9],[ 9, 9],[ 10, 9],[ 11, 9],[ 12, 9],[ 13, 9],[ 14, 9],[ 15, 9],[ 16, 9],[ 17, 9],[ 18, 9],[ 19, 9],[ 20, 9],[ 21, 9],[ 22, 9]]
+        
         filtered = [] # filter for free
         for location in bank:
             if not game_state.contains_stationary_unit(location):
