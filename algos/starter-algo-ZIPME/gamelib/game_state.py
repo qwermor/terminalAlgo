@@ -387,4 +387,12 @@ class GameState:
             warnings.filterwarnings("ignore")
         else:
             warnings.resetwarnings()
+            
+    def contains_unit_of_type(self, type, location):
+        x, y = map(int, location)
+        if self.game_map[x,y] == None: return False
+        for unit in self.game_map[x,y]:
+            if unit.unit_type == type:
+                return unit
+        return False
 
